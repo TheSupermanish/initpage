@@ -135,14 +135,14 @@ export default function OrdersPage() {
     switch (status.toLowerCase()) {
       case "confirmed":
         return (
-          <Badge className="bg-primary/20 text-primary border-primary/30">
+          <Badge className="bg-sp-coral/20 text-sp-coral border-sp-coral/30">
             <CheckCircle className="h-3 w-3 mr-1" />
             Confirmed
           </Badge>
         );
       case "fulfilled":
         return (
-          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+          <Badge className="bg-sp-blue/20 text-sp-blue border-sp-blue/30">
             <Package className="h-3 w-3 mr-1" />
             Fulfilled
           </Badge>
@@ -197,7 +197,7 @@ export default function OrdersPage() {
           <select
             value={selectedStore}
             onChange={(e) => setSelectedStore(e.target.value)}
-            className="bg-card border border-border rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="bg-card border border-border rounded-xl px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sp-coral"
           >
             {stores.map((store) => (
               <option key={store.id} value={store.id}>
@@ -210,21 +210,21 @@ export default function OrdersPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors group">
+        <div className="bg-card border border-border rounded-2xl p-6 hover:border-sp-coral/30 transition-colors group">
           <div className="flex items-center justify-between mb-4">
             <p className="text-muted-foreground font-medium">Total Orders</p>
-            <div className="h-10 w-10 rounded-xl bg-primary/10 group-hover:bg-primary flex items-center justify-center transition-colors">
-              <ShoppingCart className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+            <div className="h-10 w-10 rounded-xl bg-sp-coral/10 group-hover:bg-sp-coral flex items-center justify-center transition-colors">
+              <ShoppingCart className="h-5 w-5 text-sp-coral group-hover:text-white" />
             </div>
           </div>
           <div className="text-3xl font-bold text-foreground">{orders.length}</div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors group">
+        <div className="bg-card border border-border rounded-2xl p-6 hover:border-sp-coral/30 transition-colors group">
           <div className="flex items-center justify-between mb-4">
             <p className="text-muted-foreground font-medium">Total Revenue</p>
-            <div className="h-10 w-10 rounded-xl bg-primary/10 group-hover:bg-primary flex items-center justify-center transition-colors">
-              <DollarSign className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+            <div className="h-10 w-10 rounded-xl bg-sp-coral/10 group-hover:bg-sp-coral flex items-center justify-center transition-colors">
+              <DollarSign className="h-5 w-5 text-sp-coral group-hover:text-white" />
             </div>
           </div>
           <div className="text-3xl font-bold text-foreground">
@@ -237,11 +237,11 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/30 transition-colors group">
+        <div className="bg-card border border-border rounded-2xl p-6 hover:border-sp-coral/30 transition-colors group">
           <div className="flex items-center justify-between mb-4">
             <p className="text-muted-foreground font-medium">Confirmed Orders</p>
-            <div className="h-10 w-10 rounded-xl bg-primary/10 group-hover:bg-primary flex items-center justify-center transition-colors">
-              <CheckCircle className="h-5 w-5 text-primary group-hover:text-primary-foreground" />
+            <div className="h-10 w-10 rounded-xl bg-sp-coral/10 group-hover:bg-sp-coral flex items-center justify-center transition-colors">
+              <CheckCircle className="h-5 w-5 text-sp-coral group-hover:text-white" />
             </div>
           </div>
           <div className="text-3xl font-bold text-foreground">
@@ -258,12 +258,12 @@ export default function OrdersPage() {
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin text-sp-coral" />
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-12">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Package className="h-8 w-8 text-primary" />
+              <div className="h-16 w-16 rounded-full bg-sp-coral/10 flex items-center justify-center mx-auto mb-4">
+                <Package className="h-8 w-8 text-sp-coral" />
               </div>
               <p className="text-foreground text-lg font-bold mb-2">
                 No orders yet
@@ -279,7 +279,7 @@ export default function OrdersPage() {
                 return (
                   <div
                     key={order.id}
-                    className="border border-border rounded-2xl p-6 hover:border-primary/30 transition-all group bg-muted"
+                    className="border border-border rounded-2xl p-6 hover:border-sp-coral/30 transition-all group bg-muted"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -307,7 +307,7 @@ export default function OrdersPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">
+                        <div className="text-2xl font-bold text-sp-coral">
                           {formatCurrency(order.total_amount, order.currency)}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -340,7 +340,7 @@ export default function OrdersPage() {
                     <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                       {store && order.shopify_order_id && (
                         <button
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors text-xs font-medium"
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-sp-coral/10 text-sp-coral hover:bg-sp-coral hover:text-white transition-colors text-xs font-medium"
                           onClick={() => {
                             const url = getShopifyAdminUrl(
                               store.url,
@@ -354,7 +354,7 @@ export default function OrdersPage() {
                         </button>
                       )}
                       <button
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors text-xs font-medium"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted text-muted-foreground hover:text-sp-coral hover:bg-sp-coral/10 transition-colors text-xs font-medium"
                         onClick={() => {
                           navigator.clipboard.writeText(order.id);
                         }}
