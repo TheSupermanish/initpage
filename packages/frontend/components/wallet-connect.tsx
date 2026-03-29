@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useDisconnect } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useInterwovenKit, useUsernameQuery } from "@initia/interwovenkit-react";
 import { useAuth } from "./providers/auth-provider";
 import {
   DropdownMenu,
@@ -11,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Wallet, LogOut, User, Loader2, AlertCircle } from "lucide-react";
+import { Wallet, LogOut, User, Loader2, AlertCircle, ArrowLeftRight } from "lucide-react";
 import Image from "next/image";
 
 interface WalletConnectProps {
@@ -31,9 +30,17 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
     setMounted(true);
   }, []);
 
-  const { address, isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { disconnect } = useDisconnect();
+  const {
+    address,
+    hexAddress,
+    username,
+    isConnected,
+    openConnect,
+    openWallet,
+    openBridge,
+    disconnect,
+  } = useInterwovenKit();
+
   const { creator, isAuthenticated, isLoading, signIn, signOut } = useAuth();
 
   if (!mounted) {
@@ -48,17 +55,19 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
   const avatarUrl = creator?.avatarUrl
     || `https://api.dicebear.com/7.x/shapes/svg?seed=${creator?.name || address || "user"}`;
 
-  // Format wallet address
   const formatAddress = (addr: string | undefined) => {
     if (!addr) return "";
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
-  // Not connected - show connect button
+  // Display name: .init username > creator name > truncated address
+  const displayName = username || creator?.name || formatAddress(hexAddress);
+
+  // Not connected
   if (!isConnected) {
     return (
       <button
-        onClick={openConnectModal}
+        onClick={openConnect}
         className={btnClass(compact)}
       >
         <Wallet className="h-4 w-4" />
@@ -67,7 +76,7 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
     );
   }
 
-  // Connected but not authenticated - show sign in button
+  // Connected but not authenticated
   if (isConnected && !isAuthenticated) {
     const handleConnect = async () => {
       if (isLoading) return;
@@ -84,7 +93,7 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
         } else {
           setError(msg.length > 30 ? msg.slice(0, 30) + "..." : msg);
           disconnect();
-          openConnectModal?.();
+          openConnect();
         }
       }
     };
@@ -118,7 +127,7 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
     );
   }
 
-  // Authenticated - show user menu
+  // Authenticated
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -131,7 +140,7 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
             className="rounded-full bg-muted shadow-lg shadow-primary/10"
           />
           <span className="hidden sm:inline font-medium">
-            {creator?.name || formatAddress(address)}
+            {displayName}
           </span>
         </button>
       </DropdownMenuTrigger>
@@ -145,12 +154,21 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
             className="rounded-full bg-muted shrink-0"
           />
           <div>
-            <p className="text-sm font-semibold text-foreground">{creator?.name}</p>
+            <p className="text-sm font-semibold text-foreground">{displayName}</p>
             <p className="text-xs text-muted-foreground font-mono mt-0.5">
-              {formatAddress(address)}
+              {formatAddress(hexAddress)}
             </p>
           </div>
         </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={openWallet} className="cursor-pointer">
+          <Wallet className="h-4 w-4 mr-2" />
+          Wallet
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => openBridge()} className="cursor-pointer">
+          <ArrowLeftRight className="h-4 w-4 mr-2" />
+          Bridge
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <a href="/dashboard" className="cursor-pointer">

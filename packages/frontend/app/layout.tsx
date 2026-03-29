@@ -20,8 +20,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SuperPage - Monetize Anything with Crypto on Base",
-  description: "Paywall your APIs, files, articles, and stores with USDC on Base. AI-agent ready payments powered by HTTP 402.",
+  title: "SuperPage - Agent Commerce on Initia",
+  description: "AI-native commerce platform where agents and humans buy, sell, and monetize digital resources on Initia. Powered by x402 and ERC-8004.",
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },

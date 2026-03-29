@@ -3,6 +3,14 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  transpilePackages: [
+    '@initia/interwovenkit-react',
+    'cosmjs-types',
+    '@cosmjs/amino',
+    '@cosmjs/stargate',
+    '@cosmjs/proto-signing',
+    '@cosmjs/math',
+  ],
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
@@ -38,9 +46,6 @@ const nextConfig: NextConfig = {
     '@walletconnect/universal-provider',
     '@walletconnect/ethereum-provider',
   ],
-  turbopack: {
-    root: path.resolve(__dirname, '../../'),
-  },
 };
 
 export default nextConfig;

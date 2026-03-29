@@ -13,8 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { useAccount } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import {
   useX402Payment,
   type CheckoutRequest,
@@ -94,8 +93,7 @@ const STATUS_LABELS: Record<PaymentStatus, string> = {
 // ── Component ───────────────────────────────────────
 
 export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) {
-  const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { isConnected, openConnect } = useInterwovenKit();
   const { payForResource, payForProduct, status, error, txHash, reset } = useX402Payment();
 
   const [resourceResult, setResourceResult] = useState<ResourceResult | null>(null);
@@ -149,7 +147,7 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
 
   const handleBuy = async () => {
     if (!isConnected) {
-      openConnectModal?.();
+      openConnect();
       return;
     }
 
@@ -482,7 +480,7 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
         <DialogFooter className="gap-2 sm:gap-2">
           {status === "idle" && !isConnected && (
             <Button
-              onClick={() => openConnectModal?.()}
+              onClick={() => openConnect()}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold py-6"
             >
               <Wallet className="h-4 w-4 mr-2" />
