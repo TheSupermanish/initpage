@@ -490,7 +490,7 @@ function generateSampleFileContent(resource: any, filename: string) {
  * Serve blog/article content (URL, sitemap, or direct content)
  */
 async function serveArticle(resource: any, req: Request, res: Response) {
-  const { content, storage_key, blog_url, sitemap_url, mode } = resource.config;
+  const { content, storage_key, blog_url, sitemap_url, mode } = resource.config || {};
 
   res.setHeader("X-402-Paid", "true");
 
@@ -565,7 +565,8 @@ async function serveArticle(resource: any, req: Request, res: Response) {
   }
 
   // Mode: Direct content (default)
-  let articleContent = content;
+  // Content may be in config.content or resource.content (for simple article creation)
+  let articleContent = content || resource.content;
 
   // If content is stored in storage, fetch it - TODO: Implement with MongoDB GridFS
   if (!articleContent && storage_key) {

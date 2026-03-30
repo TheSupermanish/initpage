@@ -11,7 +11,7 @@
 // ============================================================
 
 /** Default network used when none is specified (env override: X402_CHAIN) */
-export const DEFAULT_NETWORK: NetworkId = (process.env.X402_CHAIN as NetworkId) || "base-sepolia";
+export const DEFAULT_NETWORK: NetworkId = (process.env.X402_CHAIN as NetworkId) || "initia-testnet";
 
 /** Default payment asset */
 export const DEFAULT_ASSET = "USDC";
@@ -31,11 +31,12 @@ export type NetworkId =
   | "optimism" | "optimism-sepolia"
   | "mantle-sepolia"
   | "cronos" | "cronos-testnet"
-  | "bite-v2-sandbox";
+  | "bite-v2-sandbox"
+  | "initia-testnet";
 
-export type TokenSymbol = "ETH" | "USDC" | "USDT" | "DAI" | "CRO" | "MNT" | "sFUEL";
+export type TokenSymbol = "ETH" | "USDC" | "USDT" | "DAI" | "CRO" | "MNT" | "sFUEL" | "INIT";
 
-export type NativeTokenSymbol = "ETH" | "CRO" | "MNT" | "sFUEL";
+export type NativeTokenSymbol = "ETH" | "CRO" | "MNT" | "sFUEL" | "INIT";
 
 interface TokenConfig {
   address: string;
@@ -72,6 +73,7 @@ export const TOKEN_DECIMALS: Record<string, number> = {
   CRO: 18,
   MNT: 18,
   sFUEL: 18,
+  INIT: 18,
 };
 
 // ============================================================
@@ -261,6 +263,20 @@ export const CHAIN_REGISTRY: Record<NetworkId, ChainMetadata> = {
     displayCurrency: "USDC",
     isTestnet: true,
   },
+  // Initia Testnet (MiniEVM)
+  "initia-testnet": {
+    chainId: 3981013683081008, // local-rollup-1 MiniEVM (0xdfa56fe8bb7e)
+    name: "Initia Testnet (MiniEVM)",
+    rpcUrl: process.env.INITIA_RPC_URL || "http://0.0.0.0:8545",
+    explorerUrl: "https://scan.testnet.initia.xyz",
+    nativeToken: { symbol: "INIT", decimals: 18 },
+    tokens: {
+      USDC: { address: process.env.INITIA_USDC_ADDRESS || "0x06d1a12b351cab22727515c1f4fec2544f42d751", decimals: 6 },
+    },
+    defaultPaymentToken: "USDC",
+    displayCurrency: "USDC",
+    isTestnet: true,
+  },
 };
 
 // ============================================================
@@ -296,7 +312,7 @@ export function getChainId(networkId: NetworkId): number {
  * Check if token is a native token (not an ERC-20)
  */
 export function isNativeToken(symbol: TokenSymbol): symbol is NativeTokenSymbol {
-  return ["ETH", "CRO", "MNT", "sFUEL"].includes(symbol);
+  return ["ETH", "CRO", "MNT", "sFUEL", "INIT"].includes(symbol);
 }
 
 /**
