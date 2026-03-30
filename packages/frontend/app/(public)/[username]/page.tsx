@@ -26,8 +26,8 @@ import {
   Loader2,
   ExternalLink,
 } from "lucide-react";
-import { useAccount, useWriteContract, useSwitchChain } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount, useWriteContract } from "wagmi";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { parseUnits } from "viem";
 import { PublicNavbar } from "@/components/public-navbar";
 import { PurchaseModal, type PurchaseItem } from "@/components/purchase-modal";
@@ -131,14 +131,13 @@ export default function PublicProfilePage() {
   const [tipTxHash, setTipTxHash] = useState<string | null>(null);
   const [tipError, setTipError] = useState<string | null>(null);
 
-  const { address: senderAddress, isConnected, chainId } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { switchChainAsync } = useSwitchChain();
+  const { address: senderAddress, isConnected } = useAccount();
+  const { openConnect } = useInterwovenKit();
   const { writeContractAsync } = useWriteContract();
 
   const handleTip = async (amount: string) => {
     if (!isConnected || !senderAddress) {
-      openConnectModal?.();
+      openConnect();
       return;
     }
     if (!data?.profile.walletAddress) return;
@@ -151,12 +150,6 @@ export default function PublicProfilePage() {
     setTipTxHash(null);
 
     try {
-      // Switch to payment chain if needed
-      if (chainId !== TIP_CHAIN_ID) {
-        setTipStatus("switching");
-        await switchChainAsync({ chainId: TIP_CHAIN_ID });
-      }
-
       // Send USDC transfer
       setTipStatus("sending");
       const hash = await writeContractAsync({

@@ -6,7 +6,8 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
+import { useAccount, useConnect, useSignMessage } from "wagmi";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { AuthContext, Creator, AuthContextType } from "./auth-provider";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -16,9 +17,9 @@ interface AuthProviderInnerProps {
 }
 
 export function AuthProviderInner({ children }: AuthProviderInnerProps) {
-  const { address, isConnected } = useAccount();
+  const { hexAddress, isConnected, disconnect: disconnectWallet } = useInterwovenKit();
+  const address = hexAddress;
   const { connect, connectors } = useConnect();
-  const { disconnect: disconnectWallet } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
   const [creator, setCreator] = useState<Creator | null>(null);
   const [token, setToken] = useState<string | null>(null);

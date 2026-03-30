@@ -2,39 +2,23 @@
 
 import { ReactNode, useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider, getDefaultConfig, darkTheme } from "@rainbow-me/rainbowkit";
-import { mainnet, sepolia, base, baseSepolia, polygon, arbitrum, optimism } from "wagmi/chains";
-import { cronos, cronosTestnet, mantleSepolia, biteV2Sandbox } from "@/lib/chains";
-import "@rainbow-me/rainbowkit/styles.css";
+import { createConfig, http, WagmiProvider } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import {
+  initiaPrivyWalletConnector,
+  injectStyles,
+  InterwovenKitProvider,
+  TESTNET,
+} from "@initia/interwovenkit-react";
+import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js";
 
 const queryClient = new QueryClient();
 
-// All supported chains - Base first since it's the default
-const supportedChains = [
-  baseSepolia,      // Default testnet (x402 payment chain)
-  base,             // Base mainnet
-  mainnet,          // Ethereum mainnet
-  sepolia,          // Ethereum testnet
-  polygon,          // Polygon mainnet
-  arbitrum,         // Arbitrum mainnet
-  optimism,         // Optimism mainnet
-  biteV2Sandbox,    // SKALE testnet
-  cronosTestnet,    // Cronos testnet
-  cronos,           // Cronos mainnet
-  mantleSepolia,    // Mantle testnet
-] as const;
-
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-if (!projectId || projectId === "YOUR_PROJECT_ID") {
-  console.error("WalletConnect project ID not configured. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID");
-}
-
-const config = getDefaultConfig({
-  appName: "SuperPage",
-  projectId: projectId || "YOUR_PROJECT_ID",
-  chains: supportedChains,
-  ssr: true,
+// Wagmi config with Initia's Privy connector
+const config = createConfig({
+  connectors: [initiaPrivyWalletConnector],
+  chains: [mainnet],
+  transports: { [mainnet.id]: http() },
 });
 
 interface EthereumWalletProviderProps {
@@ -45,23 +29,24 @@ export function EthereumWalletProvider({ children }: EthereumWalletProviderProps
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    injectStyles(InterwovenKitStyles);
     setMounted(true);
   }, []);
 
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={darkTheme({
-            accentColor: "#5B8FB9", // SuperPage blue from logo
-            accentColorForeground: "white",
-            borderRadius: "medium",
-          })}
-          initialChain={baseSepolia}
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config}>
+        <InterwovenKitProvider
+          {...TESTNET}
+          theme="dark"
+          enableAutoSign={{
+            // Allow auto-signing for MiniEVM contract calls (agent transactions)
+            "initiation-2": ["/minievm.evm.v1.MsgCall"],
+          }}
         >
           {mounted ? children : null}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+        </InterwovenKitProvider>
+      </WagmiProvider>
+    </QueryClientProvider>
   );
 }

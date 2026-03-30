@@ -2,10 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useAccount, useWriteContract } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { createPublicClient, http, parseAbi, formatUnits } from "viem";
 import { getDefaultChain, getDefaultChainId } from "@/lib/chains";
-import { useEnsureNetwork } from "@/hooks/use-network-switch";
 import { PublicNavbar } from "@/components/public-navbar";
 import { Droplets, Wallet, Loader2, CheckCircle2, AlertCircle, ExternalLink, Copy, Check } from "lucide-react";
 import { getTxUrl, getUsdcAddress } from "@/lib/chain-config";
@@ -35,8 +34,7 @@ type FaucetStatus = "idle" | "switching" | "minting" | "confirming" | "success" 
 
 export default function FaucetPage() {
   const { address, isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { ensureCorrectNetwork } = useEnsureNetwork(PAYMENT_CHAIN_ID);
+  const { openConnect } = useInterwovenKit();
   const { writeContractAsync } = useWriteContract();
 
   const [status, setStatus] = useState<FaucetStatus>("idle");
@@ -66,16 +64,11 @@ export default function FaucetPage() {
 
   // Mint
   const handleMint = async () => {
-    if (!isConnected) { openConnectModal?.(); return; }
+    if (!isConnected) { openConnect(); return; }
     try {
-      setStatus("switching");
+      setStatus("minting");
       setError(null);
       setTxHash(null);
-
-      const switched = await ensureCorrectNetwork();
-      if (!switched) throw new Error(`Please switch to ${PAYMENT_CHAIN.name}`);
-
-      setStatus("minting");
       const hash = await writeContractAsync({
         abi: USDC_ABI,
         address: USDC_ADDRESS,
@@ -206,7 +199,7 @@ export default function FaucetPage() {
           {/* Action button */}
           {!isConnected ? (
             <button
-              onClick={() => openConnectModal?.()}
+              onClick={() => openConnect()}
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold py-4 transition-all flex items-center justify-center gap-2"
             >
               <Wallet className="h-4 w-4" />

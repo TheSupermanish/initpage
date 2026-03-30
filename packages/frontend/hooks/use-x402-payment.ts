@@ -2,8 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAccount, useWriteContract } from "wagmi";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useEnsureNetwork } from "./use-network-switch";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { createPublicClient, http, parseAbi } from "viem";
 import { getDefaultChain, getDefaultChainId, CHAIN_BY_NAME } from "@/lib/chains";
 import { getNetwork, getUsdcAddress, USDC_ADDRESSES } from "@/lib/chain-config";
@@ -184,9 +183,7 @@ export function useX402Payment() {
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const { isConnected, address } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { ensureCorrectNetwork } = useEnsureNetwork(CURRENT_CHAIN_ID);
+  const { isConnected, hexAddress: address, openConnect } = useInterwovenKit();
   const { writeContractAsync } = useWriteContract();
 
   const reset = useCallback(() => {
@@ -197,10 +194,7 @@ export function useX402Payment() {
 
   const sendPayment = useCallback(
     async (requirements: PaymentRequirements): Promise<string> => {
-      // Switch to the correct network
-      setStatus("switching-network");
-      const switched = await ensureCorrectNetwork();
-      if (!switched) throw new Error(`Please switch to ${CURRENT_CHAIN.name} network`);
+      // On Initia appchain, no network switching needed — we're always on the right chain
 
       // Determine USDC address — use from requirements chain or current default
       const reqNetwork = requirements.network || CURRENT_NETWORK;
@@ -231,14 +225,14 @@ export function useX402Payment() {
 
       return hash;
     },
-    [ensureCorrectNetwork, writeContractAsync],
+    [writeContractAsync],
   );
 
   // Flow A: Pay for a resource (API, file, article)
   const payForResource = useCallback(
     async (resourceIdOrSlug: string): Promise<ResourceResult> => {
       if (!isConnected) {
-        openConnectModal?.();
+        openConnect();
         throw new Error("Please connect your wallet first");
       }
 
@@ -307,14 +301,14 @@ export function useX402Payment() {
         throw err;
       }
     },
-    [isConnected, address, openConnectModal, sendPayment],
+    [isConnected, address, openConnect, sendPayment],
   );
 
   // Flow B: Pay for a store product (checkout)
   const payForProduct = useCallback(
     async (checkoutData: CheckoutRequest): Promise<CheckoutResult> => {
       if (!isConnected) {
-        openConnectModal?.();
+        openConnect();
         throw new Error("Please connect your wallet first");
       }
 
@@ -376,7 +370,7 @@ export function useX402Payment() {
         throw err;
       }
     },
-    [isConnected, openConnectModal, sendPayment],
+    [isConnected, openConnect, sendPayment],
   );
 
   return {
