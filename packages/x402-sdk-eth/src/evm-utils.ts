@@ -174,6 +174,13 @@ export const CHAINS: Record<Network, Chain> = {
   cronos,
   "cronos-testnet": cronosTestnet,
   "bite-v2-sandbox": biteV2Sandbox,
+  "initia-testnet": defineChain({
+    id: 3981013683081008,
+    name: "SuperPage Rollup (Initia MiniEVM)",
+    nativeCurrency: { decimals: 18, name: "GAS", symbol: "GAS" },
+    rpcUrls: { default: { http: [process.env.INITIA_RPC_URL || "http://0.0.0.0:8545"] } },
+    testnet: true,
+  }),
 };
 
 /**
@@ -194,6 +201,7 @@ export const CHAIN_IDS: Record<Network, number> = {
   cronos: 25,
   "cronos-testnet": 338,
   "bite-v2-sandbox": 103698795,
+  "initia-testnet": 3981013683081008,
 };
 
 /**
@@ -269,6 +277,11 @@ export const TOKEN_ADDRESSES: Record<Network, Record<Exclude<TokenType, "ETH" | 
   },
   "bite-v2-sandbox": {
     USDC: "0xc4083B1E81ceb461Ccef3FDa8A9F24F0d764B6D8" as Address,
+    USDT: "0x0000000000000000000000000000000000000000" as Address,
+    DAI: "0x0000000000000000000000000000000000000000" as Address,
+  },
+  "initia-testnet": {
+    USDC: "0x06d1a12b351cab22727515c1f4fec2544f42d751" as Address,
     USDT: "0x0000000000000000000000000000000000000000" as Address,
     DAI: "0x0000000000000000000000000000000000000000" as Address,
   },

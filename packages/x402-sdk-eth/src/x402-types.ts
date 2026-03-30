@@ -26,6 +26,7 @@ export const NetworkSchema = z.enum([
   "cronos",        // Cronos Mainnet
   "cronos-testnet", // Cronos Testnet
   "bite-v2-sandbox",    // BITE V2 Sandbox 2 (SKALE)
+  "initia-testnet",     // Initia Testnet (MiniEVM rollup)
 ]);
 export type Network = z.infer<typeof NetworkSchema>;
 

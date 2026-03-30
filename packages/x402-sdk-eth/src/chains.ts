@@ -31,11 +31,12 @@ export type NetworkId =
   | "optimism" | "optimism-sepolia"
   | "mantle-sepolia"
   | "cronos" | "cronos-testnet"
-  | "bite-v2-sandbox";
+  | "bite-v2-sandbox"
+  | "initia-testnet";
 
-export type TokenSymbol = "ETH" | "USDC" | "USDT" | "DAI" | "CRO" | "MNT" | "sFUEL";
+export type TokenSymbol = "ETH" | "USDC" | "USDT" | "DAI" | "CRO" | "MNT" | "sFUEL" | "INIT";
 
-export type NativeTokenSymbol = "ETH" | "CRO" | "MNT" | "sFUEL";
+export type NativeTokenSymbol = "ETH" | "CRO" | "MNT" | "sFUEL" | "INIT";
 
 export interface TokenConfig {
   symbol: TokenSymbol;
@@ -123,6 +124,20 @@ export const biteV2Sandbox = defineChain({
   },
   blockExplorers: {
     default: { name: "BITE Explorer", url: "https://base-sepolia-testnet-explorer.skalenodes.com:10032" },
+  },
+  testnet: true,
+});
+
+// Initia Testnet (MiniEVM rollup)
+export const initiaTestnet = defineChain({
+  id: 3981013683081008,
+  name: "SuperPage Rollup (Initia MiniEVM)",
+  nativeCurrency: { decimals: 18, name: "GAS", symbol: "GAS" },
+  rpcUrls: {
+    default: { http: [process.env.INITIA_RPC_URL || "http://0.0.0.0:8545"] },
+  },
+  blockExplorers: {
+    default: { name: "Initia Scan", url: "https://scan.testnet.initia.xyz" },
   },
   testnet: true,
 });
@@ -371,6 +386,24 @@ export const CHAIN_REGISTRY: Record<NetworkId, ChainMetadata> = {
     defaultPaymentToken: "USDC",
     displayCurrency: "USDC",
   },
+
+  // Initia Testnet (MiniEVM rollup)
+  "initia-testnet": {
+    id: "initia-testnet",
+    chainId: 3981013683081008,
+    name: "SuperPage Rollup (Initia MiniEVM)",
+    shortName: "INITIA",
+    isTestnet: true,
+    viemChain: initiaTestnet,
+    rpcUrl: process.env.INITIA_RPC_URL || "http://0.0.0.0:8545",
+    explorerUrl: "https://scan.testnet.initia.xyz",
+    nativeToken: { symbol: "INIT" as NativeTokenSymbol, name: "GAS", decimals: 18 },
+    tokens: {
+      USDC: { symbol: "USDC", decimals: 6, address: "0x06d1a12b351cab22727515c1f4fec2544f42d751" },
+    },
+    defaultPaymentToken: "USDC",
+    displayCurrency: "USDC",
+  },
 };
 
 // ============================================================
@@ -441,7 +474,7 @@ export function getTxExplorerUrl(networkId: NetworkId, txHash: string): string {
  * Check if token is a native token (ETH, CRO, MNT)
  */
 export function isNativeToken(symbol: TokenSymbol): symbol is NativeTokenSymbol {
-  return ["ETH", "CRO", "MNT", "sFUEL"].includes(symbol);
+  return ["ETH", "CRO", "MNT", "sFUEL", "INIT"].includes(symbol);
 }
 
 /**
@@ -589,6 +622,7 @@ export const TOKEN_DECIMALS: Record<TokenSymbol, number> = {
   CRO: 18,
   MNT: 18,
   sFUEL: 18,
+  INIT: 18,
   USDC: 6,
   USDT: 6,
   DAI: 18,
