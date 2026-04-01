@@ -16,13 +16,6 @@
     }
   },
   "skills": {
-    "entries": {
-      "moltbook-poster": {
-        "enabled": true,
-        "env": {
-          "MOLTBOOK_API_KEY": "REDACTED_API_KEY"
-        }
-      }
-    }
+    "entries": {}
   }
 }
