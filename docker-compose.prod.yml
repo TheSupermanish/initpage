@@ -1,9 +1,8 @@
-version: "3.8"
-
 services:
   superpage:
     build:
       context: .
+      dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${APP_URL:-https://superpa.ge}
         NEXT_PUBLIC_X402_CHAIN: ${X402_CHAIN:-flow-testnet}
@@ -28,7 +27,6 @@ services:
     restart: always
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
