@@ -6,6 +6,7 @@ import {
   createPublicClient,
   createWalletClient,
   http,
+  defineChain,
   type Address,
   type Hash,
   type PublicClient,
