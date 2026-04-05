@@ -3,6 +3,7 @@
  */
 import {
   generateText,
+  stepCountIs,
   type CoreMessage,
   type CoreTool,
 } from "ai";
@@ -25,7 +26,11 @@ async function getModel(config: AgentConfig) {
     const { createGoogleGenerativeAI } = await import("@ai-sdk/google");
     return createGoogleGenerativeAI({ apiKey: config.llmApiKey })(
       config.llmModel,
-      { structuredOutputs: false }
+      {
+        structuredOutputs: false,
+        // Disable thinking for Gemini 2.5
+        thinkingConfig: undefined,
+      }
     );
   }
   throw new Error(`Unsupported LLM provider: ${config.llmProvider}`);
@@ -158,7 +163,7 @@ export async function chat(
     system: SYSTEM_PROMPT,
     messages: ctx.messages,
     tools: ctx.tools,
-    maxSteps: ctx.config.maxSteps,
+    stopWhen: stepCountIs(ctx.config.maxSteps),
     toolChoice: "auto",
     onStepFinish: (step) => {
       try {
@@ -222,7 +227,7 @@ export async function chatSync(
     system: SYSTEM_PROMPT,
     messages: ctx.messages,
     tools: ctx.tools,
-    maxSteps: ctx.config.maxSteps,
+    stopWhen: stepCountIs(ctx.config.maxSteps),
   });
 
   const assistantText = result.text || "(no response)";
