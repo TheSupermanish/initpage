@@ -13,7 +13,7 @@ const NATIVE_TOKENS: Record<string, string> = {
 };
 
 export const CHAIN_IDS: Record<string, number> = {
-  "initia-testnet": 3120269331257541,
+  "initia-testnet": 2314866461475837,
 };
 
 export const EXPLORER_URLS: Record<string, string> = {
