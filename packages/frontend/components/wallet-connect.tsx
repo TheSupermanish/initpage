@@ -10,7 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Wallet, LogOut, User, Loader2, AlertCircle, ArrowLeftRight } from "lucide-react";
+import { Wallet, LogOut, User, Loader2, AlertCircle, ArrowLeftRight, Zap } from "lucide-react";
+import { useAutoSign } from "@/hooks/use-auto-sign";
 import Image from "next/image";
 
 interface WalletConnectProps {
@@ -42,6 +43,7 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
   } = useInterwovenKit();
 
   const { creator, isAuthenticated, isLoading, signIn, signOut } = useAuth();
+  const { isEnabled: autoSignEnabled, isLoading: autoSignLoading, enable: enableAutoSign, disable: disableAutoSign } = useAutoSign();
 
   if (!mounted) {
     return (
@@ -168,6 +170,17 @@ export function WalletConnect({ compact }: WalletConnectProps = {}) {
         <DropdownMenuItem onClick={() => openBridge()} className="cursor-pointer">
           <ArrowLeftRight className="h-4 w-4 mr-2" />
           Bridge
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => autoSignEnabled ? disableAutoSign() : enableAutoSign()}
+          disabled={autoSignLoading}
+          className="cursor-pointer"
+        >
+          <Zap className={`h-4 w-4 mr-2 ${autoSignEnabled ? "text-green-400" : ""}`} />
+          <span className="flex-1">Auto-sign</span>
+          <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${autoSignEnabled ? "bg-green-500/20 text-green-400" : "bg-muted text-muted-foreground"}`}>
+            {autoSignLoading ? "..." : autoSignEnabled ? "ON" : "OFF"}
+          </span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>

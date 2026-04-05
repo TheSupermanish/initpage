@@ -7,12 +7,14 @@ import { usePathname } from "next/navigation";
 import { WalletConnect } from "./wallet-connect";
 import { ThemeToggle } from "./theme-toggle";
 import { useAuth } from "./providers/auth-provider";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { cn } from "@/lib/utils";
 import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown } from "lucide-react";
 
 export function PublicNavbar() {
   const pathname = usePathname();
   const { isAuthenticated, creator, signOut } = useAuth();
+  const { username: initUsername } = useInterwovenKit();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -100,7 +102,7 @@ export function PublicNavbar() {
                       </div>
                     )}
                     <span className="text-sm font-medium max-w-[100px] truncate">
-                      {creator?.username || creator?.walletAddress?.slice(0, 8) + "..."}
+                      {initUsername || creator?.username || creator?.walletAddress?.slice(0, 8) + "..."}
                     </span>
                     <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground transition-transform", profileOpen && "rotate-180")} />
                   </button>

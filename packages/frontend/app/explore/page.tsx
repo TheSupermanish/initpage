@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Filter, Star, TrendingUp, Users } from "lucide-react";
+import { Search, Filter, Star, TrendingUp, Users, ArrowLeftRight } from "lucide-react";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { PublicNavbar } from "@/components/public-navbar";
 import { getCurrencyDisplay } from "@/lib/chain-config";
 import { PurchaseModal, type PurchaseItem } from "@/components/purchase-modal";
@@ -78,6 +79,7 @@ const typeColors: Record<string, { bg: string; text: string; border: string; btn
 };
 
 export default function ExplorePage() {
+  const { isConnected, openBridge } = useInterwovenKit();
   const [resources, setResources] = useState<Resource[]>([]);
   const [creators, setCreators] = useState<Creator[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
@@ -217,6 +219,29 @@ export default function ExplorePage() {
           </div>
         </div>
       </div>
+
+      {/* Bridge CTA — only shown when wallet is connected */}
+      {isConnected && (
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pt-8">
+          <button
+            onClick={() => openBridge()}
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-colors group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                <ArrowLeftRight className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-foreground">Need USDC?</p>
+                <p className="text-xs text-muted-foreground">Bridge from any chain in seconds</p>
+              </div>
+            </div>
+            <span className="text-primary text-sm font-bold group-hover:underline">
+              Bridge now &rarr;
+            </span>
+          </button>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-12 flex flex-col gap-16">
         {/* Featured Creators */}
@@ -387,7 +412,14 @@ export default function ExplorePage() {
 
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Users size={14} />
-                        <span>by {resource.creator.name}</span>
+                        <span>
+                          by{" "}
+                          {resource.creator.username ? (
+                            <span className="text-primary font-medium">{resource.creator.username}</span>
+                          ) : (
+                            resource.creator.name
+                          )}
+                        </span>
                       </div>
 
                       <div className="flex gap-3">

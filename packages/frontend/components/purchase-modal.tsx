@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
+import { useAutoSign } from "@/hooks/use-auto-sign";
 import {
   useX402Payment,
   type CheckoutRequest,
@@ -33,7 +34,9 @@ import {
   AlertCircle,
   ExternalLink,
   ArrowRight,
+  ArrowLeftRight,
   Package,
+  Zap,
 } from "lucide-react";
 import { marked } from "marked";
 
@@ -94,7 +97,8 @@ const STATUS_LABELS: Record<PaymentStatus, string> = {
 // ── Component ───────────────────────────────────────
 
 export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) {
-  const { isConnected, openConnect } = useInterwovenKit();
+  const { isConnected, openConnect, openBridge } = useInterwovenKit();
+  const { isEnabled: autoSignEnabled } = useAutoSign();
   const { payForResource, payForProduct, status, error, txHash, reset } = useX402Payment();
 
   const [resourceResult, setResourceResult] = useState<ResourceResult | null>(null);
@@ -233,7 +237,9 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
                 )}
                 {isResource && item.data.creator && (
                   <span className="text-xs text-muted-foreground">
-                    by {item.data.creator.name}
+                    by {item.data.creator.username ? (
+                      <span className="text-primary font-medium">{item.data.creator.username}</span>
+                    ) : item.data.creator.name}
                   </span>
                 )}
               </div>
@@ -249,7 +255,14 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
         {/* Price */}
         <div className="flex items-center justify-between p-4 rounded-xl bg-muted border border-border">
           <span className="text-sm text-muted-foreground font-medium">Price</span>
-          <span className="text-xl font-bold text-primary">{price}</span>
+          <div className="flex items-center gap-2">
+            {autoSignEnabled && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
+                <Zap className="h-3 w-3" /> Instant purchase
+              </span>
+            )}
+            <span className="text-xl font-bold text-primary">{price}</span>
+          </div>
         </div>
 
         {/* Product image (large) */}
@@ -354,12 +367,18 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
           <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-3">
             <div className="flex items-center gap-3">
               {status === "awaiting-approval" ? (
-                <Wallet className="h-5 w-5 text-primary animate-pulse" />
+                autoSignEnabled ? (
+                  <Zap className="h-5 w-5 text-green-400 animate-pulse" />
+                ) : (
+                  <Wallet className="h-5 w-5 text-primary animate-pulse" />
+                )
               ) : (
                 <Loader2 className="h-5 w-5 text-primary animate-spin" />
               )}
               <span className="text-sm font-medium text-foreground">
-                {STATUS_LABELS[status]}
+                {status === "awaiting-approval" && autoSignEnabled
+                  ? "Signing automatically..."
+                  : STATUS_LABELS[status]}
               </span>
             </div>
             {txHash && (
@@ -377,9 +396,20 @@ export function PurchaseModal({ open, onOpenChange, item }: PurchaseModalProps) 
 
         {/* Error */}
         {status === "error" && error && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-            <AlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={18} />
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 space-y-3">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={18} />
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+            {/insufficient|not enough/i.test(error) && (
+              <button
+                onClick={() => openBridge()}
+                className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 w-full justify-center"
+              >
+                <ArrowLeftRight className="h-4 w-4" />
+                Bridge funds from another chain
+              </button>
+            )}
           </div>
         )}
 
